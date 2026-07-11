@@ -28,6 +28,164 @@
         </div>
     </header>
 
-    
+    <!-- MAIN QUIZ INTERFACE -->
+
+    <div class="flex flex-1 overflow-hidden">
+
+        <!-- SIDEBAR NAVIGATION (1 to 33 Questions) -->
+
+        <aside class="w-80 bg-white border-r border-gray-200 p-6 flex flex-col justify-between overflow-y-auto">
+            <div>
+                <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex justify-between items-center">
+                    <span>Quiz Navigation</span>
+                    <span id="answered-counter" class="text-xs bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full">0 / 33 Answered</span>
+                </h2>
+
+                <!-- Dynamic Grid for Buttons -->
+
+                <div id="nav-grid" class="grid grid-cols-4 gap-2">
+                    <!-- JavaScript will load 33 buttons here dynamically-->
+                </div>
+            </div>
+
+            <!-- Submit actions at the bottom of the sidebar -->
+
+            <div class="pt-6 border-t border-gray-100">
+                <button onclick="openSubmitModal()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow transition duration-200 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>Submit All & Finish</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN QUESTION WORKSPACE -->
+
+        <main class="flex-1 bg-gray-100 p-8 overflow-y-auto flex flex-col">
+
+            <!-- Question card-->
+
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex-1 flex flex-col">
+                <div class="flex justify-between items-center border-b border-gray-100 pb-4 mb-4">
+                    <h3 id="question-title" class="text-lg font-bold text-gray-800">Question 1</h3>
+                    <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full">Marks: 5.00</span>
+                </div>
+
+                <!-- Prompt -->
+
+                <div class="text-gray-700 font-medium mb-6 leading-relaxed bg-blue-50/50 p-4 rounded-xl border border-blue-100/50" id="question-text">
+                    Loading your question details...
+                </div>
+
+                <!-- Lower navigation controls -->
+
+                <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-100">
+                    <button id="prev-btn" onclick="prevQuestion()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2.5 px-6 rounded-xl transition duration-150 flex items-center space-x-2 disabled:opacity-40">
+                        <i class="fa-solid fa-arrow-left"></i>
+                        <span>Previous</span>
+                    </button>
+
+                    <button id="next-btn" onclick="nextQuestion()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-xl transition duration-150 flex items-center space-x-2">
+                        <span>Next</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MOODLE-STYLE SUBMIT CONFIRMATION MODAL -->
+
+    <div id="submit-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl border border-gray-100 w-full max-w-md p-6 transform scale-95 transition-transform duration-300">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-amber-100 text-amber-600 mb-4">
+                    <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">Submit all answers and finish?</h3>
+                <p class="text-sm text-gray-500 mb-6">Once you click submit, your responses will be locked and you will not be able to change them.</p>
+
+                <div class="bg-amber-50 rounded-xl p-4 mb-6 border border-amber-100 text-left">
+                    <span id="modal-status-text" class="text-sm font-semibold text-amber-900"></span>
+                </div>
+            </div>
+            <div class="flex space-x-3">
+                <button onclick="closeSubmitModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 px-4 rounded-xl transition">
+                    Cancle
+                </button>
+                <button onclick="processFinalSubmit()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow transition">
+                    Submit and finish
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- WEB ENGINE LOGIC -->
+
+    <script>
+
+        const quizData = {
+            1: {
+                title: "U6_LOTS_ReverseArray",
+                text: "Write a C++ program that reads 5 integers from the user and stores them in an array. Print the elements of the array in reverse order, separated by a single space.<br><br><strong>Example Output Format:</strong> 50 40 30 20 10",
+                code: ""
+            },
+            2: {
+                title: "U4_LOTS_SumOfDigits",
+                text: "Write a C++ program that reads a positive integer from the user and calculates the sum of its digits using a 'while' loop.<br><br><strong>Hint:</strong> Extract the last digit using modulo (%), add it to a sum variable, and then remove it using division (/).",
+                code: ""
+            }
+        };
+
+        // Dynamically build out placeholder data up to 33 questions
+        for (let i = 3; i <= 33; i++) {
+            quizData[i] = {
+                title: `C++ Quiz Question ${i}`,
+                text: `Write a flexible C++ programming algorithm designed to correctly process your custom instructions for Question ${i}. Ensure data constraints match standard parameters.`,
+                code: ""
+            };
+        }
+
+        let currentActiveIdx = 1;
+        const totalQuestions = 33;
+
+        function initNavigationGrid() {
+            const grid = document.getElementById('nav-grid');
+            grid.innerHTML = '';
+            for (let i = 1; i <= totalQuestions; i++) {
+                const btn = document.createElement('button');
+                btn.id = `nav-btn-${i}`;
+                btn.innerText = i;
+                btn.className = `py-2.5 font-bold rounded-lg border text-center transition duration-150 ${
+                    i === currentActiveIdx
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                    : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200'
+                }`;
+                btn.onclick = () => saveAndSwitchQuestion(i);
+                grid.appendChild(btn);
+            }
+            updateCounters();
+        }
+
+        function renderActiveQuestion() {
+            const q = quizData[currentActiveIdx];
+            document.getElementById('question-title').innerText = `${currentActiveIdx}. ${q.title}`;
+            document.getElementById('question-text').innerHTML = q.text;
+            document.getElementById('code-editor').value = q.code;
+
+            document.getElementById('prev-btn').disable = (currentActiveIdx === 1);
+            document.getElementById('next-btn').innerHTML = (currentActiveIdx === totalQuestions)
+                ? 'Review Finish <i class="fa-solid fa-flag-checkered ml-2"></i>'
+                : 'Next <i class="fa-solid fa-arrow-right ml-2"></i>';
+
+            for (let i = 1; i <= totalQuestions; i++) {
+                const btn = document.getElementById(`nav-btn-${i}`);
+                if (btn) {
+                    if (i === currentActiveIdx) {
+                        btn.className = 'py-2.5 font-bold rounded-lg text-center bg-blue'
+                    }
+                }
+            }
+        }
+    </script>
 </body>
 </html>
