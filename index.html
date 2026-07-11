@@ -3,189 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GNE C++ Online Portal</title>
-
+    <title>GNE C++ Online IDE Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <!-- Ace Editor Library for Professional IDE Features -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.32.3/ace.js"></script>
+    <style>
+        /* Custom scrollbar for a sleek look */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+        #editor { font-size: 15px; }
+    </style>
 </head>
+<body class="bg-gray-100 font-sans flex flex-col h-screen overflow-hidden">
 
-<body class="bg-gray-50 font-sans flex flex-col h-screen">
-
-    <header class="bg-blue-900 text-white shadow-md px-6 py-4 flex justify-between items-center shrink-0">
+    <!-- HEADER BANNER -->
+    <header class="bg-[#1e293b] text-white shadow-md px-6 py-3 flex justify-between items-center shrink-0 border-b border-gray-700">
         <div class="flex items-center space-x-4">
-            <div class="bg-white p-2 rounded-full text-blue-900 font-bold text-xl tracking-wider shadow">GNE</div>
+            <div class="bg-blue-600 text-white p-2 rounded text-lg font-bold tracking-wider shadow">GNE</div>
             <div>
-                <h1 class="text-xl font-bold tracking-wider">Guru Nanak Dev Engineering College</h1>
-                <p class="text-xs text-blue-200">Department of Computer Science & Engineering | Quiz Portal</p>
+                <h1 class="text-lg font-bold tracking-wide">Guru Nanak Dev Engineering College</h1>
+                <p class="text-xs text-gray-400">Department of Computer Science & Engineering</p>
             </div>
         </div>
-        <div class="text-right">
-            <span class="bg-blue-800 px-4 py-2 rounded-lg text-sm font-semibold border border-blue-700">
-                <i class="fa-solid fa-code mr-2"></i>Course: B.Tech C++ Programming
+        <div class="flex items-center space-x-4">
+            <span class="text-gray-300 text-sm">
+                <i class="fa-solid fa-user-graduate mr-2"></i>B.Tech C++ Programming
             </span>
+            <button onclick="openSubmitModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold py-1.5 px-4 rounded transition">
+                Submit Exam
+            </button>
         </div>
     </header>
 
-    <!-- MAIN QUIZ INTERFACE -->
-
+    <!-- MAIN WORKSPACE: 3-Column Split -->
     <div class="flex flex-1 overflow-hidden">
-
-        <!-- SIDEBAR NAVIGATION (1 to 33 Questions) -->
-
-        <aside class="w-80 bg-white border-r border-gray-200 p-6 flex flex-col justify-between overflow-y-auto">
-            <div>
-                <h2 class="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex justify-between items-center">
-                    <span>Quiz Navigation</span>
-                    <span id="answered-counter" class="text-xs bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full">0 / 33 Answered</span>
-                </h2>
-
-                <!-- Dynamic Grid for Buttons -->
-
-                <div id="nav-grid" class="grid grid-cols-4 gap-2">
-                    <!-- JavaScript will load 33 buttons here dynamically-->
-                </div>
+        
+        <!-- COLUMN 1: NAVIGATION -->
+        <aside class="w-64 bg-white border-r border-gray-200 flex flex-col z-10 shadow-sm">
+            <div class="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Questions</span>
+                <span id="answered-counter" class="text-xs bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded">0 / 33</span>
             </div>
-
-            <!-- Submit actions at the bottom of the sidebar -->
-
-            <div class="pt-6 border-t border-gray-100">
-                <button onclick="openSubmitModal()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow transition duration-200 flex items-center justify-center space-x-2">
-                    <i class="fa-solid fa-circle-check"></i>
-                    <span>Submit All & Finish</span>
-                </button>
+            <div class="flex-1 overflow-y-auto p-4">
+                <div id="nav-grid" class="grid grid-cols-3 gap-2">
+                    <!-- Buttons load here -->
+                </div>
             </div>
         </aside>
 
-        <!-- MAIN QUESTION WORKSPACE -->
-
-        <main class="flex-1 bg-gray-100 p-8 overflow-y-auto flex flex-col">
-
-            <!-- Question card-->
-
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 flex-1 flex flex-col">
-                <div class="flex justify-between items-center border-b border-gray-100 pb-4 mb-4">
-                    <h3 id="question-title" class="text-lg font-bold text-gray-800">Question 1</h3>
-                    <span class="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full">Marks: 5.00</span>
+        <!-- COLUMN 2: QUESTION DETAILS -->
+        <main class="w-1/3 bg-white border-r border-gray-200 flex flex-col z-10 shadow-sm overflow-y-auto relative">
+            <div class="p-6 flex-1">
+                <div class="flex justify-between items-start mb-4">
+                    <h2 id="question-title" class="text-xl font-bold text-gray-800">Loading...</h2>
+                    <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-1 rounded">5.00 Pts</span>
                 </div>
-
-                <!-- Prompt -->
-
-                <div class="text-gray-700 font-medium mb-6 leading-relaxed bg-blue-50/50 p-4 rounded-xl border border-blue-100/50" id="question-text">
-                    Loading your question details...
+                <div class="prose prose-sm text-gray-600 max-w-none" id="question-text">
+                    Loading question details...
                 </div>
-
-                <!-- Lower navigation controls -->
-
-                <div class="flex justify-between items-center mt-6 pt-4 border-t border-gray-100">
-                    <button id="prev-btn" onclick="prevQuestion()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2.5 px-6 rounded-xl transition duration-150 flex items-center space-x-2 disabled:opacity-40">
-                        <i class="fa-solid fa-arrow-left"></i>
-                        <span>Previous</span>
-                    </button>
-
-                    <button id="next-btn" onclick="nextQuestion()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-6 rounded-xl transition duration-150 flex items-center space-x-2">
-                        <span>Next</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-                </div>
+            </div>
+            
+            <!-- Bottom Navigation Controls -->
+            <div class="p-4 border-t border-gray-100 bg-gray-50 flex justify-between items-center sticky bottom-0">
+                <button id="prev-btn" onclick="prevQuestion()" class="text-sm font-bold text-gray-600 hover:text-blue-600 transition disabled:opacity-30">
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Prev
+                </button>
+                <button id="next-btn" onclick="nextQuestion()" class="text-sm font-bold text-blue-600 hover:text-blue-800 transition">
+                    Next <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
             </div>
         </main>
-    </div>
 
-    <!-- MOODLE-STYLE SUBMIT CONFIRMATION MODAL -->
-
-    <div id="submit-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
-        <div class="bg-white rounded-2xl shadow-2xl border border-gray-100 w-full max-w-md p-6 transform scale-95 transition-transform duration-300">
-            <div class="text-center">
-                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-amber-100 text-amber-600 mb-4">
-                    <i class="fa-solid fa-triangle-exclamation text-xl"></i>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">Submit all answers and finish?</h3>
-                <p class="text-sm text-gray-500 mb-6">Once you click submit, your responses will be locked and you will not be able to change them.</p>
-
-                <div class="bg-amber-50 rounded-xl p-4 mb-6 border border-amber-100 text-left">
-                    <span id="modal-status-text" class="text-sm font-semibold text-amber-900"></span>
+        <!-- COLUMN 3: IDE & TERMINAL -->
+        <section class="flex-1 flex flex-col bg-[#272822]">
+            <!-- Editor Toolbar -->
+            <div class="h-10 bg-[#1e1f1c] flex items-center justify-between px-4 border-b border-black">
+                <div class="text-gray-400 text-xs font-mono"><i class="fa-solid fa-code mr-2"></i>main.cpp</div>
+                <div class="flex space-x-2">
+                    <button onclick="simulateRunCode()" class="bg-gray-700 hover:bg-emerald-600 text-white text-xs font-bold py-1 px-3 rounded flex items-center transition">
+                        <i class="fa-solid fa-play mr-1.5"></i> Run Code
+                    </button>
                 </div>
             </div>
+            
+            <!-- Ace Editor Container -->
+            <div id="editor" class="flex-1 w-full"></div>
+
+            <!-- Fake Terminal Output -->
+            <div class="h-48 bg-[#1e1f1c] border-t border-black flex flex-col">
+                <div class="h-8 bg-[#2d2e29] flex items-center px-4 text-xs font-bold text-gray-400 uppercase tracking-widest border-b border-black">
+                    Terminal Output
+                </div>
+                <div id="terminal-output" class="flex-1 p-4 font-mono text-sm text-gray-300 overflow-y-auto">
+                    > Ready to compile...
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- SUBMIT MODAL -->
+    <div id="submit-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-white rounded shadow-2xl max-w-sm w-full p-6 text-center">
+            <i class="fa-solid fa-flag-checkered text-3xl text-blue-600 mb-4"></i>
+            <h3 class="text-xl font-bold mb-2">Submit Exam?</h3>
+            <p id="modal-status-text" class="text-sm text-gray-600 mb-6"></p>
             <div class="flex space-x-3">
-                <button onclick="closeSubmitModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 px-4 rounded-xl transition">
-                    Cancle
-                </button>
-                <button onclick="processFinalSubmit()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl shadow transition">
-                    Submit and finish
-                </button>
+                <button onclick="closeSubmitModal()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 rounded">Cancel</button>
+                <button onclick="processFinalSubmit()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded">Submit</button>
             </div>
         </div>
     </div>
 
-    <!-- WEB ENGINE LOGIC -->
-
+    <!-- SCRIPT -->
     <script>
+        // Initialize Ace Editor
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/monokai"); // Dark IDE theme
+        editor.session.setMode("ace/mode/c_cpp"); // C++ syntax highlighting
+        editor.setShowPrintMargin(false);
 
+        const totalQuestions = 33;
+        let currentActiveIdx = 1;
+        const defaultCode = "#include <iostream>\nusing namespace std;\n\nint main() {\n    // Write your code here\n    \n    return 0;\n}";
+
+        // Sample Data
         const quizData = {
-            1: {
-                title: "U6_LOTS_ReverseArray",
-                text: "Write a C++ program that reads 5 integers from the user and stores them in an array. Print the elements of the array in reverse order, separated by a single space.<br><br><strong>Example Output Format:</strong> 50 40 30 20 10",
-                code: ""
-            },
-            2: {
-                title: "U4_LOTS_SumOfDigits",
-                text: "Write a C++ program that reads a positive integer from the user and calculates the sum of its digits using a 'while' loop.<br><br><strong>Hint:</strong> Extract the last digit using modulo (%), add it to a sum variable, and then remove it using division (/).",
-                code: ""
-            }
+            1: { title: "Reverse Array", text: "Write a C++ program that reads 5 integers from the user and stores them in an array. Print the elements of the array in reverse order, separated by a single space.<br><br><strong>Example Output Format:</strong> 50 40 30 20 10", code: "" },
+            2: { title: "Sum of Digits", text: "Write a C++ program that reads a positive integer from the user and calculates the sum of its digits using a 'while' loop.<br><br><strong>Hint:</strong> Use modulo (%) and division (/).", code: "" }
         };
 
-        // Dynamically build out placeholder data up to 33 questions
-        for (let i = 3; i <= 33; i++) {
-            quizData[i] = {
-                title: `C++ Quiz Question ${i}`,
-                text: `Write a flexible C++ programming algorithm designed to correctly process your custom instructions for Question ${i}. Ensure data constraints match standard parameters.`,
-                code: ""
-            };
+        for (let i = 3; i <= totalQuestions; i++) {
+            quizData[i] = { title: `C++ Problem ${i}`, text: `Problem description for question ${i}. Ensure all edge cases are handled.`, code: "" };
         }
 
-        let currentActiveIdx = 1;
-        const totalQuestions = 33;
-
-        function initNavigationGrid() {
+        function initApp() {
             const grid = document.getElementById('nav-grid');
             grid.innerHTML = '';
             for (let i = 1; i <= totalQuestions; i++) {
                 const btn = document.createElement('button');
                 btn.id = `nav-btn-${i}`;
                 btn.innerText = i;
-                btn.className = `py-2.5 font-bold rounded-lg border text-center transition duration-150 ${
-                    i === currentActiveIdx
-                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                    : 'bg-gray-50 hover:bg-gray-100 text-gray-700 border-gray-200'
-                }`;
-                btn.onclick = () => saveAndSwitchQuestion(i);
+                btn.onclick = () => switchQuestion(i);
                 grid.appendChild(btn);
             }
-            updateCounters();
+            loadQuestion(1);
         }
 
-        function renderActiveQuestion() {
-            const q = quizData[currentActiveIdx];
-            document.getElementById('question-title').innerText = `${currentActiveIdx}. ${q.title}`;
+        function switchQuestion(newIdx) {
+            quizData[currentActiveIdx].code = editor.getValue(); // Save code from Ace
+            document.getElementById('terminal-output').innerHTML = "> Ready to compile..."; // Reset terminal
+            loadQuestion(newIdx);
+        }
+
+        function loadQuestion(idx) {
+            currentActiveIdx = idx;
+            const q = quizData[idx];
+            
+            document.getElementById('question-title').innerText = `${idx}. ${q.title}`;
             document.getElementById('question-text').innerHTML = q.text;
-            document.getElementById('code-editor').value = q.code;
+            
+            // Load code into Ace Editor
+            editor.setValue(q.code || defaultCode, -1);
+            
+            document.getElementById('prev-btn').disabled = (idx === 1);
+            document.getElementById('next-btn').innerHTML = (idx === totalQuestions) ? 'Finish <i class="fa-solid fa-flag-checkered ml-1"></i>' : 'Next <i class="fa-solid fa-arrow-right ml-1"></i>';
+            
+            updateUI();
+        }
 
-            document.getElementById('prev-btn').disable = (currentActiveIdx === 1);
-            document.getElementById('next-btn').innerHTML = (currentActiveIdx === totalQuestions)
-                ? 'Review Finish <i class="fa-solid fa-flag-checkered ml-2"></i>'
-                : 'Next <i class="fa-solid fa-arrow-right ml-2"></i>';
-
+        function updateUI() {
+            let answered = 0;
             for (let i = 1; i <= totalQuestions; i++) {
                 const btn = document.getElementById(`nav-btn-${i}`);
-                if (btn) {
-                    if (i === currentActiveIdx) {
-                        btn.className = 'py-2.5 font-bold rounded-lg text-center bg-blue'
-                    }
-                }
+                const hasCode = quizData[i].code.trim() !== "" && quizData[i].code !== defaultCode;
+                if (hasCode) answered++;
+                
+                btn.className = `py-2 text-sm font-bold rounded border transition ${
+                    i === currentActiveIdx ? 'bg-blue-600 text-white border-blue-600' :
+                    hasCode ? 'bg-emerald-100 text-emerald-800 border-emerald-200' : 'bg-gray-50 text-gray-600 border-gray-200 hover:bg-gray-200'
+                }`;
             }
+            document.getElementById('answered-counter').innerText = `${answered} / ${totalQuestions}`;
         }
+
+        function nextQuestion() { if (currentActiveIdx < totalQuestions) switchQuestion(currentActiveIdx + 1); else openSubmitModal(); }
+        function prevQuestion() { if (currentActiveIdx > 1) switchQuestion(currentActiveIdx - 1); }
+
+        function simulateRunCode() {
+            quizData[currentActiveIdx].code = editor.getValue();
+            updateUI();
+            const term = document.getElementById('terminal-output');
+            term.innerHTML = "<span class='text-blue-400'>> Compiling main.cpp...</span><br>";
+            setTimeout(() => {
+                term.innerHTML += "<span class='text-emerald-400'>> Compilation successful. Executing...</span><br><br>";
+                term.innerHTML += "<span class='text-white'>Program Output:<br>Processing completed with exit code 0.</span>";
+            }, 800);
+        }
+
+        function openSubmitModal() {
+            quizData[currentActiveIdx].code = editor.getValue();
+            updateUI();
+            document.getElementById('submit-modal').classList.remove('hidden');
+            let answered = 0;
+            for (let i = 1; i <= totalQuestions; i++) if (quizData[i].code.trim() !== "" && quizData[i].code !== defaultCode) answered++;
+            document.getElementById('modal-status-text').innerText = `You have answered ${answered} out of ${totalQuestions} questions.`;
+        }
+
+        function closeSubmitModal() { document.getElementById('submit-modal').classList.add('hidden'); }
+        function processFinalSubmit() { alert("Exam submitted securely!"); closeSubmitModal(); }
+
+        initApp();
     </script>
 </body>
 </html>
