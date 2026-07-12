@@ -1,0 +1,18 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Private Exam Data
+questions.xml
+
+# Temporary or local scripts
+builder.py
+
+# Node modules and environment variables (Preparing for future backend)
+node_modules/
+.env
